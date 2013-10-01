@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript">
+	var primeArray = new Array();
+        var pNumArray = new Array();
+        /*
+         * getUserInput() - Function call after the user clicks the button
+         * 
+         * The html code I used for the input box prevents the user from 
+         * typing in anything except a numerical value. So no error messages
+         * are displayed if the user typed in something other than a 
+         * numerical value simply because it is impossible for the 
+         * user to do so.
+         * 
+         * Does not take any params nor does it return anything
+         */
+        function getUserInput()
+        {  
+             userInput = document.FormInput.userInput.value;
+	     userInput = parseInt(userInput); //convert to integer
+
+             //find the prime factors and display them first
+	     findPrimeFactors(userInput);
+             primeArray.length = 0; //reset prime number array
+             
+             //find the perfect numbers and display last
+             findPerfectNumbers(userInput);
+             pNumArray.length = 0; //reset perfect number array
+        }
+
+        /*
+         * Function called in getUserInput() used to find the prime factors
+         * of the users input. Validates that the user has entered in a 
+         * digit > 1 and dsiplays an error message otherwise.
+         * 
+         * params ui - this is the number that the user input
+         * 
+         * Displays the prime numbers in an alert box
+         */
+	function findPrimeFactors(ui)
+	{
+            originalNumber = ui; //used for output
+            if(ui <= 1) //ensure input is legal numeric value
+            {
+                alert("Illegal number, please enter a number greater than 1.");
+            }
+            else 
+            {
+                //always push 1 into array as it's always a divisor
+                primeArray.push(1); 
+                for(var i = 2; i <= ui; i++)
+                {
+                    isFactor = false;
+                    tempI = i;
+                    
+                    while(ui % tempI == 0)
+                    {
+                       isFactor = true;
+                       ui = ui / tempI; 
+                    }
+                    if(isFactor == true)
+                        primeArray.push(i);
+                }
+                alert("Prime factors of "+ originalNumber +": "
+                      + primeArray.toString());
+            }
+	}
+        
+        /*
+         * Function called in getUserInput() used to find the perfect numbers
+         * between 1 and N (the users input). Validates that the user has 
+         * entered in a digit > 1 and dsiplays an error message otherwise.
+         * 
+         * params ui - this is the number that the user input
+         * 
+         * Displays the perfect numbers in an alert box
+         */
+	function findPerfectNumbers(ui)
+	{
+            if(ui <= 1) //ensure input is legal numeric value
+            {
+                alert("Illegal number, please enter a number greater than 1.");
+            }
+            else
+            {
+                for(var j = 2; j < ui; j++)
+                {
+                    sum = 1; //same concept as starting the array at 1
+                    for(var i = 2; i <= j; i++)
+                    {
+                        isFactor = false;
+                        tempI = i;
+                        tempJ = j;
+
+                        while(tempJ % tempI == 0)
+                        {
+                           isFactor = true;
+                           tempJ  = tempJ / tempI; 
+                        }
+                        if(isFactor == true)
+                        {
+                            //can't use tempI here because tempI value has
+                            //changed to a value that will not work.
+                            sum+=i;
+                        }
+                    }
+                    sum -= j;
+                    if(sum == j) //perfect number
+                    {
+                        pNumArray.push(j);
+                    }
+                }
+                alert("All perfect numbers between 1 and "+ ui +": "
+                        + pNumArray.toString());
+            }
+	}
+    </script>
+  </head>
+  <body>
+    <h3>CS430 P1, Part 2<br>
+    </h3>
+    <form name="FormInput">
+	Choose a number: <input type="text" 
+       			onkeyup="this.value=this.value.replace(/[^\d]+/,'')" 
+			name="userInput"><br>
+    </form>
+    <button type="button" onclick="getUserInput()">Click when done</button>
+  </body>
+</html>

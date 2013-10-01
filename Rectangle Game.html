@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+      table {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      td {
+        border: 1px solid black;
+        width: 50px;
+        height: 50px;
+        background: white;
+        text-align: center;
+      }
+    </style>
+    
+    <script type="text/javascript">
+    
+      var SIZE = 4;
+      var WHITE = '#FFFFFF', BLACK='#000000';  // tile colors
+      var blankRow = 3, blankCol = 3;  // location of the blank
+      var clicks = 0;
+      var clickedRandom = 0;
+      // initial tile values
+      var tileValues = [ 
+        [1, 2, 3, 4], 
+        [5, 6, 7, 8], 
+        [9, 10, 11, 12], 
+        [13, 14, 15, 0] ];
+        
+      var count = 0;
+      /*
+       * Display the initial tile configuration.
+       */
+      window.onload = function() { displayTiles(); };
+      
+      /*
+       * Return a reference to the tile at the specified row and col (zero-based).
+       */
+      function getTile(row, col) {
+        return document.getElementById('b'+row+col);
+      }
+
+      /*
+       * Display the tiles as defined in the array.
+       */
+      function displayTiles() {
+        for (var r=0; r<SIZE; r++) {
+          for (var c=0; c<SIZE; c++) {
+            if (tileValues[r][c] == 0) {
+              getTile(r, c).style.background = BLACK; 
+            }
+            else {
+              getTile(r, c).style.background = WHITE;
+              getTile(r, c).innerHTML = tileValues[r][c]; 
+            }
+          }
+        }     
+      }
+      
+      /*
+       * Handle a button click on a tile.
+       */
+      function handle(row, col) {
+        // If a tile above, below, left, or right of the blank tile is clicked,
+        // those two tiles should be swapped, and the tiles redisplayed. 
+        // All relevant variables must be updated in the move.
+        var validClick = false;
+        
+        var verticalClick = window['blankRow'] - row;
+        var horizontalClick = window['blankCol'] - col;
+        
+        count++; //simply used for the click counter, nothing else
+        
+        if(verticalClick == 1 && horizontalClick == 0) //North Click
+            validClick = true;
+        else if(verticalClick == -1 && horizontalClick == 0) //South Click
+            validClick = true;
+        else if(horizontalClick == 1 && verticalClick == 0) //West Click
+            validClick = true;
+        else if(horizontalClick == -1 && verticalClick == 0) //East Click
+            validClick = true;
+        else //invalid click
+        {
+            validClick = false;
+            alert("Invalid Click");
+        }
+                    
+        // handle the button click here ...
+        if(validClick == true)
+        {
+            Swap(row, col);
+        }
+        findBlackBox();//update blackbox location
+        updateCounter();//update the click counter
+        displayTiles(); //display the new order of tiles 
+      }
+      
+      /*
+       * Shuffle tiles by moving the blank spot (0) randomly, 100 times.
+       * 
+       * Basically I generate a random number for the rows and  columns and 
+       * swap the appropriate coordinates with the black box 100 times
+       */
+      function randomize(number)
+      {
+        if(count > 1 && clickedRandom == 0)
+        {
+            clickedRandom = 1;
+            alert("Clicking Randomize won't reset the counter. Cheater.");
+        }
+        // Randomize tile values here...
+        if(number < 100)
+        {
+            var rnRow;
+            var rnCol;
+            rnRow = Math.floor(Math.random()*tileValues.length);
+            rnCol = Math.floor(Math.random()*tileValues.length);
+
+            if(isBlackBox(rnRow, rnCol) == 1)
+            {
+                randomize(number);
+            }
+            else
+            {
+                //Perform Swap
+                Swap(rnRow, rnCol);
+                
+                randomize(number+1);
+            }
+            if(number == 99)
+                findBlackBox();
+        }
+        else
+        { 
+            displayTiles();
+            clickedRandom = 0;
+        }
+    }
+          
+    function Swap(row, column)
+    {
+        findBlackBox();
+
+        tileValues[window['blankRow']][window['blankCol']] = tileValues[row][column];
+        tileValues[row][column] = 0;   
+    }
+    /*
+     * Used in randomizing the tiles
+     * 
+     * Returns 0 if the [row, col] combination isn't the box
+     * Returns 1 if the [row, col] combination is the box
+     */
+    function isBlackBox(row, column)
+    {
+        var value = 0;
+        
+        if(row == window['blankRow'] && column == window['blankCol']) 
+        {
+            value = 1;
+        }
+        
+        return value;
+    }
+    /*
+     * Function that does exactly what its name implies - it finds the black
+     * box.
+     */
+    function findBlackBox()
+    {
+        for (var h=0; h<SIZE; h++)
+        {
+          for (var i=0; i<SIZE; i++)
+          {
+            if(tileValues[h][i] == 0)
+            {
+              window['blankRow'] = h;
+              window['blankCol'] = i;
+            }
+          }
+        }
+    }
+    function updateCounter()
+    {
+        if(count == 30)
+        {
+            alert("Just wanted you to know that there is no winner" +
+                   " in this game. Even if you do manage to get the"+
+                    " numbers in order.");
+        }
+        if(count == 50)
+        {
+            alert("You sure are persistent...");
+        }
+        if(count == 75)
+        {
+            alert("Ok...seriously, shouldn't you be doing something else?");
+        }
+        document.getElementById('c'+1).innerHTML = count;
+    }
+    
+    </script>
+
+  </head>
+  <body>
+    <p>
+       The goal of this game is to put the tiles in order, from 1 to 15 (starting at upper left).
+       <br/>
+       When a tile that is adjacent to the blank (black) tile is clicked, that tile and the blank
+       should change places.
+       <br/>
+       Start by randomizing the tiles!
+    </p>
+    <hr/>
+
+    <table>
+      <tbody>
+        <tr>
+          <td id="b00" onclick="handle(0, 0);"></td>
+          <td id="b01" onclick="handle(0, 1);"></td>
+          <td id="b02" onclick="handle(0, 2);"></td>
+          <td id="b03" onclick="handle(0, 3);"></td>
+        </tr>
+        <tr>
+          <td id="b10" onclick="handle(1, 0);"></td>
+          <td id="b11" onclick="handle(1, 1);"></td>
+          <td id="b12" onclick="handle(1, 2);"></td>
+          <td id="b13" onclick="handle(1, 3);"></td>
+        </tr>       
+        <tr>
+          <td id="b20" onclick="handle(2, 0);"></td>
+          <td id="b21" onclick="handle(2, 1);"></td>
+          <td id="b22" onclick="handle(2, 2);"></td>
+          <td id="b23" onclick="handle(2, 3);"></td>
+        </tr>        
+        <tr>
+          <td id="b30" onclick="handle(3, 0);"></td>
+          <td id="b31" onclick="handle(3, 1);"></td>
+          <td id="b32" onclick="handle(3, 2);"></td>
+          <td id="b33" onclick="handle(3, 3);"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr/>
+    <input type="button" onclick="randomize(count);" value="Randomize"/>
+    <table border="3">
+    <tr>
+        <td id="c0">Number of Clicks</td>
+    </tr>
+    <tr>
+        <td id="c1"></td>
+    </tr>
+    </table>
+  </body>
+</html>
+
